@@ -8,3 +8,4 @@ django-url-filter==0.3.8
 djangorestframework==3.9.2
 mysqlclient==1.4.2.post1
 django_extensions==2.2.8
+pymysql
