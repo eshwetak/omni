@@ -25,7 +25,7 @@ SECRET_KEY = '2$zd-fhx8)lx@vl6l2ygf3cg3)72u81j+3_t&$(&sutj1qon7l'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['omni-hack.herokuapp.com', '127.0.0.1']
 import pymysql
 pymysql.install_as_MySQLdb()
 pymysql.version_info = (1, 4, 0, "final", 0)
