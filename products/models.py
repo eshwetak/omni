@@ -35,10 +35,11 @@ class Vendors(models.Model):
     longitude = models.CharField(max_length=200)
     sample_delivery = models.BooleanField(default=False)
     virtual_assistance = models.BooleanField(default=False)
-    open_slot = models.TextField(max_length=200)
+    open_slot = models.TextField(max_length=200, default='9:00AM - 6:00PM')
+    store_kind = models.TextField(max_length=500, default='Furniture store')
     address = models.TextField(max_length=200)
     image = models.TextField(max_length=2000)
-    ratings = models.IntegerField()
+    ratings = models.IntegerField(default=4)
     country = models.ForeignKey(
         Country, on_delete=models.DO_NOTHING, db_constraint=False, db_index=True
     )
@@ -57,6 +58,8 @@ class Products(models.Model):
     kind = models.CharField(max_length=250)
     dimension = models.CharField(max_length=2000)
     image = models.CharField(max_length=1500, null=False)
+    is_liked = models.BooleanField(default=False)
+    color = models.CharField(max_length=500, null=True)
     category = models.ForeignKey(
         Category, on_delete=models.DO_NOTHING, db_constraint=False, db_index=True
     )
