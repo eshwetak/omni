@@ -50,7 +50,6 @@ class ProductsController(APIView):
     def get(request):
         query_dict = request.GET
         ven_id = query_dict.get('vendor_id')
-
         query = f'''SELECT  products.image,
                             products.display_name as product_display_name,
                             products.is_liked,
