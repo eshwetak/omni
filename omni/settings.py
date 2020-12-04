@@ -81,9 +81,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'omni',
-        'USER': 'root',
-        'PASSWORD': 'livspace',
-        'HOST': 'localhost',
+        'USER': 'lscombinator',
+        'PASSWORD': 'combinatorplusplus',
+        'HOST': 'lscombinator-hackathon.ciq7fhve3lvr.ap-southeast-1.rds.amazonaws.com',
         'PORT': 3306,
         'ATOMIC_REQUESTS': True,
     }
