@@ -1,0 +1,10 @@
+
+Django==2.2
+django-cors-headers==3.1.1
+django-filter==2.0.0
+django-redis==4.10.0
+django-redis-sentinel==1.0
+django-url-filter==0.3.8
+djangorestframework==3.9.2
+mysqlclient==1.4.2.post1
+django_extensions==2.2.8
