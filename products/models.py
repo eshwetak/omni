@@ -60,6 +60,8 @@ class Products(models.Model):
     image = models.CharField(max_length=1500, null=False)
     is_liked = models.BooleanField(default=False)
     color = models.CharField(max_length=500, null=True)
+    description = models.CharField(max_length=200, default='Furniture Store')
+    added_to_cart = models.IntegerField(default=0)
     category = models.ForeignKey(
         Category, on_delete=models.DO_NOTHING, db_constraint=False, db_index=True
     )
