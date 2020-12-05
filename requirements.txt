@@ -15,3 +15,5 @@ pyzmq==20.0.0
 sqlparse==0.4.1
 whitenoise==5.2.0
 django-cors-headers
+pyqrcode
+png
