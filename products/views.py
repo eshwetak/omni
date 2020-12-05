@@ -5,9 +5,9 @@ from rest_framework import status
 from rest_framework.response import Response
 from products.models import Vendors, Products
 from django.db import connection
-import pyqrcode
-import png
-from pyqrcode import QRCode
+# import pyqrcode
+# import png
+# from pyqrcode import QRCode
 from django.http import JsonResponse
 
 qrcodes = {
@@ -75,14 +75,14 @@ class ProductsController(APIView):
         response = [dict(zip(colms, row)) for row in rows]
         return JsonResponse({'products': response})
 
-class GenerateQrCode(APIView):
-    @staticmethod
-    def get(request):
-        query_dict = request.GET
-        prodt_name = query_dict.get('product_name')
-        ven_name = query_dict.get('vendor_name')
+# class GenerateQrCode(APIView):
+#     @staticmethod
+#     def get(request):
+#         query_dict = request.GET
+#         prodt_name = query_dict.get('product_name')
+#         ven_name = query_dict.get('vendor_name')
 
-        qrStr = "asdf"
-        url = QRCode(content=b'836590873213', error='H', version=3, mode='binary')
-        url.show()
-        return APIResponse.send()
+#         qrStr = "asdf"
+#         url = QRCode(content=b'836590873213', error='H', version=3, mode='binary')
+#         url.show()
+#         return APIResponse.send()
