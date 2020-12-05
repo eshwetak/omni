@@ -63,6 +63,8 @@ class Products(models.Model):
     description = models.CharField(max_length=200, default='Furniture Store')
     added_to_cart = models.IntegerField(default=0)
     prices = models.IntegerField(default=30000)
+    in_cart = models.BooleanField(default=False)
+    cart_item_count = models.IntegerField(default=0)
     sku = models.CharField(max_length=200, default='SF2SMD0012S0003')
     category = models.ForeignKey(
         Category, on_delete=models.DO_NOTHING, db_constraint=False, db_index=True

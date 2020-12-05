@@ -11,9 +11,9 @@ from django.db import connection
 from django.http import JsonResponse
 
 qrcodes = {
-    1: 836590873213,
-    2: 678532790765,
-    3: 746499766876
+    836590873213: 1,
+    678532790765: 2,
+    746499766876: 3
 }
 
 # Create your views here.
@@ -55,11 +55,13 @@ class ProductsController(APIView):
     @staticmethod
     def get(request, id):
         query_dict = request.GET
-        query = f'''SELECT  products.image,
+        query = f'''SELECT  products.id,
+                            products.image,
                             products.display_name as product_display_name,
                             products.is_liked,
                             vendors.display_name as vendor_display_name,
-                            products.prices
+                            products.prices,
+                            products.vendor_id
                     from products
                     inner join vendors on vendors.id = products.vendor_id
                     where products.vendor_id = {id};'''
@@ -75,10 +77,15 @@ class ProductsController(APIView):
 class ProductDetails(APIView):
     @staticmethod
     def get(request, id):
-        query = f'''SELECT  products.image,
+        codes = [836590873213, 678532790765, 746499766876]
+        if id in codes:
+            id = qrcodes[id]
+        query = f'''SELECT  products.id,
+                        products.image,
                         products.display_name as product_display_name,
                         products.is_liked,
                         vendors.display_name as vendor_display_name,
+                        products.vendor_id, 
                         products.prices,
                         products.color,
                         products.sku,
@@ -99,7 +106,8 @@ class ProductDetails(APIView):
 class FetchVendorById(APIView):
     @staticmethod
     def get(request, id):
-        query = f'''SELECT  vendors.image,
+        query = f'''SELECT  vendors.id,
+                        vendors.image,
                         vendors.display_name,
                         vendors.ratings,
                         vendors.address,
