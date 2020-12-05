@@ -5,6 +5,16 @@ from rest_framework import status
 from rest_framework.response import Response
 from products.models import Vendors, Products
 from django.db import connection
+import pyqrcode
+import png
+from pyqrcode import QRCode
+from django.http import JsonResponse
+
+qrcodes = {
+    1: 836590873213,
+    2: 678532790765,
+    3: 746499766876
+}
 
 # Create your views here.
 class APIResponse:
@@ -39,7 +49,7 @@ class VendorsController(APIView):
                 i['distance'] = d
             stores = sorted(stores, key=lambda i : i['distance'])
 
-        return APIResponse.send({'stores': stores})
+        return JsonResponse({'stores': list(stores)})
     
 class ProductsController(APIView):
     @staticmethod
@@ -63,4 +73,16 @@ class ProductsController(APIView):
         colms = [i[0] for  i in cur.description]
 
         response = [dict(zip(colms, row)) for row in rows]
-        return APIResponse.send({'products': response})
+        return JsonResponse({'products': response})
+
+class GenerateQrCode(APIView):
+    @staticmethod
+    def get(request):
+        query_dict = request.GET
+        prodt_name = query_dict.get('product_name')
+        ven_name = query_dict.get('vendor_name')
+
+        qrStr = "asdf"
+        url = QRCode(content=b'836590873213', error='H', version=3, mode='binary')
+        url.show()
+        return APIResponse.send()
