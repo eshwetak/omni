@@ -56,12 +56,14 @@ class Products(models.Model):
     display_name = models.CharField(max_length=200, null=False)
     style = models.CharField(max_length=150)
     kind = models.CharField(max_length=250)
-    dimension = models.CharField(max_length=2000)
+    dimension = models.CharField(max_length=2000, default='45 X 64 X 90')
     image = models.CharField(max_length=1500, null=False)
     is_liked = models.BooleanField(default=False)
     color = models.CharField(max_length=500, null=True)
     description = models.CharField(max_length=200, default='Furniture Store')
     added_to_cart = models.IntegerField(default=0)
+    prices = models.IntegerField(default=30000)
+    sku = models.CharField(max_length=200, default='SF2SMD0012S0003')
     category = models.ForeignKey(
         Category, on_delete=models.DO_NOTHING, db_constraint=False, db_index=True
     )

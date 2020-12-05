@@ -53,19 +53,16 @@ class VendorsController(APIView):
     
 class ProductsController(APIView):
     @staticmethod
-    def get(request):
+    def get(request, id):
         query_dict = request.GET
-        ven_id = query_dict.get('vendor_id')
         query = f'''SELECT  products.image,
                             products.display_name as product_display_name,
                             products.is_liked,
                             vendors.display_name as vendor_display_name,
-                            price.amount,
-                            price.currency
+                            products.prices
                     from products
                     inner join vendors on vendors.id = products.vendor_id
-                    left join price on products.id = price.product_id
-                    where price.vendor_id = {ven_id} and products.vendor_id = {ven_id};'''
+                    where products.vendor_id = {id};'''
         
         with connection.cursor() as cur:
             cur.execute(query)
@@ -74,6 +71,51 @@ class ProductsController(APIView):
 
         response = [dict(zip(colms, row)) for row in rows]
         return JsonResponse({'products': response})
+
+class ProductDetails(APIView):
+    @staticmethod
+    def get(request, id):
+        query = f'''SELECT  products.image,
+                        products.display_name as product_display_name,
+                        products.is_liked,
+                        vendors.display_name as vendor_display_name,
+                        products.prices,
+                        products.color,
+                        products.sku,
+                        products.description,
+                        products.dimension
+                    from products
+                    inner join vendors on vendors.id = products.vendor_id
+                    WHERE products.id = {id};'''
+
+        with connection.cursor() as cur:
+            cur.execute(query)
+            rows = cur.fetchall()
+        colms = [i[0] for  i in cur.description]
+        response = [dict(zip(colms, row)) for row in rows]
+        return JsonResponse(response and response[0])
+
+
+class FetchVendorById(APIView):
+    @staticmethod
+    def get(request, id):
+        query = f'''SELECT  vendors.image,
+                        vendors.display_name,
+                        vendors.ratings,
+                        vendors.address,
+                        vendors.open_slot,
+                        vendors.sample_delivery,
+                        vendors.virtual_assistance,
+                        vendors.store_kind
+                    from vendors
+                    where vendors.id ={id};'''
+        
+        with connection.cursor() as cur:
+            cur.execute(query)
+            rows = cur.fetchall()
+        colms = [i[0] for  i in cur.description]
+        response = [dict(zip(colms, row)) for row in rows]
+        return JsonResponse(response and response[0])
 
 # class GenerateQrCode(APIView):
 #     @staticmethod
