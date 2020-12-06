@@ -16,13 +16,13 @@ qrcodes = {
     746499766876: 3
 }
 
-# Create your views here.
-class APIResponse:
-    @staticmethod
-    def send(data, code=status.HTTP_200_OK, error=None):
-        if error:
-            return Response(data=error, status=code)
-        return Response(data=data, status=code)
+def queryDb(query):
+    with connection.cursor() as cur:
+        cur.execute(query)
+        rows = cur.fetchall()
+        colms = [i[0] for  i in cur.description]
+    response = [dict(zip(colms, row)) for row in rows]
+    return response
 
 class VendorsController(APIView):
     @staticmethod
@@ -30,15 +30,12 @@ class VendorsController(APIView):
         query_dict = request.GET
         lat = query_dict.get('lat')
         lon = query_dict.get('lon')
-        sample = query_dict.get('sample_delivery')
-        virtual = query_dict.get('virtual_assistance')
 
         stores = Vendors.objects.all()
-
         if "sample_delivery" in query_dict:
-            stores = stores.filter(sample_delivery=sample)
+            stores = stores.filter(sample_delivery=query_dict['sample_delivery'])
         if "virtual_assistance" in query_dict:
-            stores = stores.filter(virtual_assistance=virtual)
+            stores = stores.filter(virtual_assistance=query_dict['virtual_assistance'])
         stores = stores.values()
 
         if lat and lon:
@@ -64,31 +61,20 @@ class ProductsByVendor(APIView):
                     from products
                     inner join vendors on vendors.id = products.vendor_id
                     where products.vendor_id = {id};'''
-        
-        with connection.cursor() as cur:
-            cur.execute(query)
-            rows = cur.fetchall()
-        colms = [i[0] for  i in cur.description]
 
-        response = [dict(zip(colms, row)) for row in rows]
-        return JsonResponse({'products': response})
+        return JsonResponse({'products': queryDb(query)})
 
 class ProductsController(APIView):
     @staticmethod
     def get(request):
         query_dict = request.GET
-        in_cart = query_dict.get('in_cart')
-        is_liked = query_dict.get('is_liked')
-
-        condition = f"where "
-        if 'in_cart' in query_dict and 'is_liked' in query_dict:
-            condition = f'''{condition} in_cart = {query_dict.get('in_cart')} and 
-                            is_liked = {query_dict.get('is_liked')}'''
-        elif 'in_cart' in query_dict:
-            condition = f"{condition} in_cart = {query_dict.get('in_cart')}"
-        elif 'is_liked' in query_dict:
-            condition = f"{condition} is_liked = {query_dict.get('is_liked')}"
-
+        
+        if len(query_dict) > 0:
+            condition = ' AND '.join(map(lambda i: f'{i[0]}={i[1]}', 
+                                                query_dict.items()))
+            condition = 'where ' + condition
+        else: condition = ''
+       
         query = f'''SELECT  products.id,
                         products.image,
                         products.display_name as product_display_name,
@@ -105,13 +91,8 @@ class ProductsController(APIView):
                     from products
                     inner join vendors on vendors.id = products.vendor_id
                     {condition};'''
-        
-        with connection.cursor() as cur:
-            cur.execute(query)
-            rows = cur.fetchall()
-        colms = [i[0] for  i in cur.description]
-        response = [dict(zip(colms, row)) for row in rows]
-        return JsonResponse({'products': response})
+
+        return JsonResponse({'products': queryDb(query)})
 
 class ProductDetails(APIView):
     @staticmethod
@@ -135,34 +116,25 @@ class ProductDetails(APIView):
                     inner join vendors on vendors.id = products.vendor_id
                     WHERE products.id = {id};'''
 
-        with connection.cursor() as cur:
-            cur.execute(query)
-            rows = cur.fetchall()
-        colms = [i[0] for  i in cur.description]
-        response = [dict(zip(colms, row)) for row in rows]
+        response = queryDb(query)
         return JsonResponse(response and response[0])
 
     @staticmethod
     def put(request, id):
         data=request.data
-        product = Products.objects.get(pk=id)
+        allowed_keys = ['in_cart', 'cart_item_count', 'is_liked']
 
-        if 'in_cart' in data.keys():
-            product.in_cart = data['in_cart']
-        if 'cart_item_count' in data.keys():
-            product.cart_item_count = data['cart_item_count']
-        if 'is_liked' in data.keys():
-            product.is_liked = data['is_liked']
-        
+        product = Products.objects.get(pk=id)
+        for key in allowed_keys:
+            if key in data.keys():
+                setattr(product, key, data[key])
         product.save()
 
         p = product.__dict__
         p.pop('_state')
-        p['product_display_name'] = p['display_name']
-        p.pop('display_name')
+        p['product_display_name'] = p.pop('display_name')
 
         return JsonResponse({'product': p})
-
 
 class FetchVendorById(APIView):
     @staticmethod
@@ -179,11 +151,7 @@ class FetchVendorById(APIView):
                     from vendors
                     where vendors.id ={id};'''
         
-        with connection.cursor() as cur:
-            cur.execute(query)
-            rows = cur.fetchall()
-        colms = [i[0] for  i in cur.description]
-        response = [dict(zip(colms, row)) for row in rows]
+        response = queryDb(query)
         return JsonResponse(response and response[0])
 
 class SimilarProducts(APIView):
@@ -207,12 +175,8 @@ class SimilarProducts(APIView):
                             kind like '%{criteria}%' or 
                             prices like '%{criteria}%' or 
                             style like '%{criteria}%';'''
-        with connection.cursor() as cur:
-            cur.execute(query)
-            rows = cur.fetchall()
-        colms = [i[0] for  i in cur.description]
-        response = [dict(zip(colms, row)) for row in rows]
-        return JsonResponse({'products': response})
+        
+        return JsonResponse({'products': queryDb(query)})
 
 
 # class GenerateQrCode(APIView):
@@ -222,7 +186,7 @@ class SimilarProducts(APIView):
 #         prodt_name = query_dict.get('product_name')
 #         ven_name = query_dict.get('vendor_name')
 
-#         qrStr = "asdf"
+#         qrStr = 'asdf'
 #         url = QRCode(content=b'836590873213', error='H', version=3, mode='binary')
 #         url.show()
-#         return APIResponse.send()
+            # return JsonResponse({'status': 200})
