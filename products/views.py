@@ -80,10 +80,14 @@ class ProductsController(APIView):
         in_cart = query_dict.get('in_cart')
         is_liked = query_dict.get('is_liked')
 
-        if 'in_cart' in query_dict:
-            condition = f"where in_cart = {query_dict.get('in_cart')}"
-        if 'is_liked' in query_dict:
-            condition = f"where is_liked = {query_dict.get('is_liked')}"
+        condition = f"where "
+        if 'in_cart' in query_dict and 'is_liked' in query_dict:
+            condition = f'''{condition} in_cart = {query_dict.get('in_cart')} and 
+                            is_liked = {query_dict.get('is_liked')}'''
+        elif 'in_cart' in query_dict:
+            condition = f"{condition} in_cart = {query_dict.get('in_cart')}"
+        elif 'is_liked' in query_dict:
+            condition = f"{condition} is_liked = {query_dict.get('is_liked')}"
 
         query = f'''SELECT  products.id,
                         products.image,
@@ -153,6 +157,8 @@ class ProductDetails(APIView):
 
         p = product.__dict__
         p.pop('_state')
+        p['product_display_name'] = p['display_name']
+        p.pop('display_name')
 
         return JsonResponse({'product': p})
 
