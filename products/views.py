@@ -51,7 +51,7 @@ class VendorsController(APIView):
 
         return JsonResponse({'stores': list(stores)})
     
-class ProductsController(APIView):
+class ProductsByVendor(APIView):
     @staticmethod
     def get(request, id):
         query = f'''SELECT  products.id,
@@ -70,6 +70,42 @@ class ProductsController(APIView):
             rows = cur.fetchall()
         colms = [i[0] for  i in cur.description]
 
+        response = [dict(zip(colms, row)) for row in rows]
+        return JsonResponse({'products': response})
+
+class ProductsController(APIView):
+    @staticmethod
+    def get(request):
+        query_dict = request.GET
+        in_cart = query_dict.get('in_cart')
+        is_liked = query_dict.get('is_liked')
+
+        if 'in_cart' in query_dict:
+            condition = f"where in_cart = {query_dict.get('in_cart')}"
+        if 'is_liked' in query_dict:
+            condition = f"where is_liked = {query_dict.get('is_liked')}"
+
+        query = f'''SELECT  products.id,
+                        products.image,
+                        products.display_name as product_display_name,
+                        products.is_liked,
+                        products.in_cart,
+                        vendors.display_name as vendor_display_name,
+                        products.vendor_id, 
+                        products.prices,
+                        products.cart_item_count,
+                        products.color,
+                        products.sku,
+                        products.description,
+                        products.dimension
+                    from products
+                    inner join vendors on vendors.id = products.vendor_id
+                    {condition};'''
+        
+        with connection.cursor() as cur:
+            cur.execute(query)
+            rows = cur.fetchall()
+        colms = [i[0] for  i in cur.description]
         response = [dict(zip(colms, row)) for row in rows]
         return JsonResponse({'products': response})
 

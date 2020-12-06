@@ -61,7 +61,6 @@ class Products(models.Model):
     is_liked = models.BooleanField(default=False)
     color = models.CharField(max_length=500, null=True)
     description = models.CharField(max_length=200, default='Furniture Store')
-    added_to_cart = models.IntegerField(default=0)
     prices = models.IntegerField(default=30000)
     in_cart = models.BooleanField(default=False)
     cart_item_count = models.IntegerField(default=0)
