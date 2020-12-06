@@ -54,7 +54,6 @@ class VendorsController(APIView):
 class ProductsController(APIView):
     @staticmethod
     def get(request, id):
-        query_dict = request.GET
         query = f'''SELECT  products.id,
                             products.image,
                             products.display_name as product_display_name,
@@ -102,6 +101,25 @@ class ProductDetails(APIView):
         response = [dict(zip(colms, row)) for row in rows]
         return JsonResponse(response and response[0])
 
+    @staticmethod
+    def put(request, id):
+        data=request.data
+        product = Products.objects.get(pk=id)
+
+        if 'in_cart' in data.keys():
+            product.in_cart = data['in_cart']
+        if 'cart_item_count' in data.keys():
+            product.cart_item_count = data['cart_item_count']
+        if 'is_liked' in data.keys():
+            product.is_liked = data['is_liked']
+        
+        product.save()
+
+        p = product.__dict__
+        p.pop('_state')
+
+        return JsonResponse({'product': p})
+
 
 class FetchVendorById(APIView):
     @staticmethod
@@ -124,6 +142,9 @@ class FetchVendorById(APIView):
         colms = [i[0] for  i in cur.description]
         response = [dict(zip(colms, row)) for row in rows]
         return JsonResponse(response and response[0])
+
+
+
 
 # class GenerateQrCode(APIView):
 #     @staticmethod
