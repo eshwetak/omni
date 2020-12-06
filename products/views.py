@@ -128,6 +128,7 @@ class ProductDetails(APIView):
                         products.prices,
                         products.color,
                         products.sku,
+                        products.cart_item_count,
                         products.description,
                         products.dimension
                     from products
