@@ -185,7 +185,33 @@ class FetchVendorById(APIView):
         response = [dict(zip(colms, row)) for row in rows]
         return JsonResponse(response and response[0])
 
-
+class SimilarProducts(APIView):
+    @staticmethod
+    def get(request, criteria):
+        query = f'''SELECT  products.id,
+                        products.image,
+                        products.display_name as product_display_name,
+                        products.is_liked,
+                        vendors.display_name as vendor_display_name,
+                        products.vendor_id, 
+                        products.prices,
+                        products.cart_item_count,
+                        products.color,
+                        products.sku,
+                        products.description,
+                        products.dimension
+                    from products
+                    inner join vendors on vendors.id = products.vendor_id
+                    WHERE  color LIKE '%{criteria}%' or 
+                            kind like '%{criteria}%' or 
+                            prices like '%{criteria}%' or 
+                            style like '%{criteria}%';'''
+        with connection.cursor() as cur:
+            cur.execute(query)
+            rows = cur.fetchall()
+        colms = [i[0] for  i in cur.description]
+        response = [dict(zip(colms, row)) for row in rows]
+        return JsonResponse({'products': response})
 
 
 # class GenerateQrCode(APIView):

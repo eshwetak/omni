@@ -7,4 +7,5 @@ urlpatterns = [
     path(r'vendors/<int:id>/products', products.views.ProductsByVendor.as_view()),
     path(r'products/<int:id>', products.views.ProductDetails.as_view()),
     path(r'products', products.views.ProductsController.as_view()),
+    path(r'products/similar/<criteria>', products.views.SimilarProducts.as_view())
 ]
