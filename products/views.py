@@ -121,6 +121,10 @@ class ProductDetails(APIView):
 
     @staticmethod
     def put(request, id):
+        codes = [836590873213, 678532790765, 746499766876]
+        if id in codes:
+            id = qrcodes[id]
+
         data=request.data
         allowed_keys = ['in_cart', 'cart_item_count', 'is_liked']
 
